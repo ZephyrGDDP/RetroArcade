@@ -57,7 +57,7 @@ window.addEventListener('keyup', (e) => {
 
 
 async function loadDungeonMap() {
-    const response = await fetch('https://drive.google.com/uc?id=1rfN9ePd7Bf48gSCw1ImnAwoaDbFvhYNq');
+    const response = await fetch('https://zephyrgddp.github.io/MazeGame/level1.txt');
     const text = await response.text();
     const levels = text.split("\n\n"); 
     
