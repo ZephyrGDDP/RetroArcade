@@ -1,14 +1,38 @@
-// Set up the game canvas and context
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Quest</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #222;
+            color: #fff;
+        }
+        canvas {
+            border: 2px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Constants
-const tileSize = 40; // Size of each tile in the dungeon
-const gridWidth = 20; // Width of the grid in tiles
-const gridHeight = 15; // Height of the grid in tiles
-const playerSpeed = 5; // Speed of the player movement
 
-// Player object
+const tileSize = 40; 
+const gridWidth = 20; 
+const gridHeight = 15; 
+const playerSpeed = 5; 
+
+
 const player = {
     x: 1,
     y: 1,
@@ -17,27 +41,10 @@ const player = {
     color: 'green'
 };
 
-// Dungeon map (1 for walls, 0 for empty space)
-const dungeonMap = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1],
-    [1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1],
-    [1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
 
-// Handle keyboard input for movement
+let dungeonMap = [];
+
+
 let keys = {};
 
 window.addEventListener('keydown', (e) => {
@@ -48,42 +55,55 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });
 
-// Game loop
+
+async function loadDungeonMap() {
+    const response = await fetch('https://drive.google.com/uc?id=1rfN9ePd7Bf48gSCw1ImnAwoaDbFvhYNq');
+    const text = await response.text();
+    const levels = text.split("\n\n"); 
+    
+    
+    dungeonMap = levels[0].split("\n").map(line => line.split('').map(Number));
+    
+    
+    gameLoop();
+}
+
+
 function gameLoop() {
-    // Clear the canvas
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw dungeon
+    
     drawDungeon();
 
-    // Move the player
+    
     movePlayer();
 
-    // Request next frame
+    
     requestAnimationFrame(gameLoop);
 }
 
-// Draw dungeon map
+
 function drawDungeon() {
     for (let row = 0; row < gridHeight; row++) {
         for (let col = 0; col < gridWidth; col++) {
             if (dungeonMap[row][col] === 1) {
-                ctx.fillStyle = 'gray'; // Wall color
+                ctx.fillStyle = 'gray'; 
             } else {
-                ctx.fillStyle = 'black'; // Empty space color
+                ctx.fillStyle = 'black'; 
             }
             ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
         }
     }
 }
 
-// Draw the player
+
 function drawPlayer() {
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x * tileSize, player.y * tileSize, player.width, player.height);
 }
 
-// Handle player movement and collision detection
+
 function movePlayer() {
     const newX = player.x;
     const newY = player.y;
@@ -109,9 +129,12 @@ function movePlayer() {
         }
     }
 
-    // Draw the player
+    
     drawPlayer();
 }
 
-// Start the game loop
-gameLoop();
+
+loadDungeonMap();
+</script>
+</body>
+</html>
